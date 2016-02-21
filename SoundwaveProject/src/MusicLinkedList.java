@@ -1,4 +1,5 @@
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Multi-linked list that implements MusicList interface
@@ -14,6 +15,7 @@ public class MusicLinkedList implements MusicList{
 	public MusicLinkedList(float sampleRate, int numChannels) {
 		this.sampleRate = sampleRate;
 		this.numChannels = numChannels;
+		this.numSamples = 0;
 		this.head = null;
 	}
 
@@ -100,8 +102,9 @@ public class MusicLinkedList implements MusicList{
 	 * Add a single sample to the end of the SoundList.  Throws an exception if the soundlist has more than 1 channel 
 	 * @param sample The sample to add
 	 */
-	public void addSample(float sample) {
-		head = new Sample(sample, head.getTime() + sampleRate, head);
+	public void addSample(float audio) {
+		head = new Sample(audio, head, null);
+		numSamples++;
 	}
 
 	
@@ -110,8 +113,25 @@ public class MusicLinkedList implements MusicList{
 	 * array is not the same as the number of channels in the sound list
 	 * @param sample Array of samples (one for each channel) to add to the end of the SoundList
 	 */
-	public void addSample(float[] samples) {
-		head = new Sample(samples, head.getTime() + sampleRate, samples.length, head);
+	public void addSample(float[] audio) {
+		Sample currentSample = null;
+		for (int i = audio.length - 1; i >= 0; i--) {
+			Sample nextSample = head;
+			
+			if (nextSample != null) { //if this is not the first sample of this channel
+				for (int j = 0; j < i; j++) {
+					nextSample = nextSample.nextChannel;
+				}
+			}
+			currentSample = new Sample(audio[0], nextSample, currentSample);
+		}
+		head = currentSample;
+		numSamples++;
+		
+		// TODO erase debugging stuff
+//		if (numSamples >= 9990) {
+//			System.out.println("addSample: " + numSamples + " " + audio[0]);
+//		}
 	}
 
 	
@@ -120,8 +140,7 @@ public class MusicLinkedList implements MusicList{
 	 * @return iterator
 	 */
 	public Iterator<float[]> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		return new MultiChannelIterator();
 	}
 
 	
@@ -131,8 +150,11 @@ public class MusicLinkedList implements MusicList{
 	 * @return the iterator to traverse the list
 	 */
 	public Iterator<Float> iterator(int channel) {
-		// TODO Auto-generated method stub
-		return null;
+		if (channel > this.numChannels) {
+			throw new IndexOutOfBoundsException("Cannot create iterator because channel " + channel + " does not exist");
+		} else {
+			return new SingleChannelIterator(channel);
+		}
 	}
 
 	
@@ -201,50 +223,104 @@ public class MusicLinkedList implements MusicList{
 	 *
 	 */
 	public class Sample {
-		public float sample;
-		public float time;
-		public int channel;
+		public float audio;
 		public Sample next;
 		public Sample nextChannel;
 		
 		
 		/**
-		 * Constructor for Sample on channel 1
-		 * @param sample
-		 * @param next
+		 * Constructor for Sample
+		 * @param sample audio data for this sample
+		 * @param next next sample of the song for this channel
+		 * @param nextChannel sample of the next channel at same time as this sample
 		 */
-		public Sample(float sample, float time, Sample next) {
-			this.channel = 1;
-			this.sample = sample;
+		public Sample(float audio, Sample next, Sample nextChannel) {
+			this.audio = audio;
 			this.next = next;
-			this.nextChannel = null;
-		}
-		
-		
-		/**
-		 * Constructor for Samples channel 2 or higher
-		 * @param samples list of samples for this time
-		 * @param channel channel for this sample
-		 * @param next
-		 */
-		public Sample(float[] samples, float time, int channel, Sample next){
-			this.channel = channel;
-			this.sample = samples[channel];
-			this.next = next;
+			this.nextChannel = nextChannel;
 			
-			if (channel == 2) {
-				nextChannel = new Sample(samples, time, channel - 1, next.nextChannel);
-			} else {
-				nextChannel = new Sample(samples[1], time, next.nextChannel);
+			// TODO erase debugging stuff
+//			if (numSamples < 10) {
+//				System.out.println("Sample audio: " + (numSamples + 1) + " " + this.audio); 
+//			}
+		}
+	}
+	
+	
+	/**
+	 * Iterator for single channel
+	 * @author RonZapp
+	 * I got inspiration for the implementation of this class from
+	 * http://codereview.stackexchange.com/questions/48109/simple-example-of-an-iterable-and-an-iterator-in-java
+	 *
+	 */
+	public class SingleChannelIterator implements Iterator<Float> {
+		private Sample currentSample;
+		
+		public SingleChannelIterator(int channel) {
+			currentSample = head;
+			for (int i = 1; i < channel; i++) {
+				currentSample = currentSample.nextChannel;
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return currentSample != null;
+		}
+
+		@Override
+		public Float next() {
+			if (hasNext()) {
+				Float returnData = currentSample.audio;
+				currentSample = currentSample.next;
+				return returnData;
+			}
+			throw new NoSuchElementException("There is no next element");
+		}
+	}
+	
+	
+	/**
+	 * Iterator for all channels
+	 * @author RonZapp
+	 * I got inspiration for the implementation of this class from
+	 * http://codereview.stackexchange.com/questions/48109/simple-example-of-an-iterable-and-an-iterator-in-java
+	 * 
+	 */
+	public class MultiChannelIterator implements Iterator<float[]> {
+		private Sample[] currentSamples;
+		private int sampleNumber = 0;
+		
+		public MultiChannelIterator() {
+			currentSamples = new Sample[numChannels];
+			currentSamples[0] = head;
+			for (int i = 1; i < numChannels; i++) {
+				currentSamples[i] = currentSamples[i-1].nextChannel;
 			}
 		}
 		
-		
-		/**
-		 * returns time of sample
-		 */
-		public float getTime() {
-			return this.time;
+		@Override
+		public boolean hasNext() {
+			return currentSamples[0].next != null;
+		}
+
+		@Override
+		public float[] next() {
+			if (hasNext()) {
+				float[] returnData = new float[currentSamples.length];
+				for (int i = 0; i < currentSamples.length; i++) {
+					returnData[i] = currentSamples[i].audio;
+					currentSamples[i] = currentSamples[i].next;
+				}
+				// TODO erase debugging stuff
+//				sampleNumber++;
+//				if (sampleNumber <= 10) {
+//					System.out.println("iterator: " + sampleNumber + " " + returnData[0]);
+//				}
+				return returnData;
+			}
+			throw new NoSuchElementException("There is no next element");
 		}
 	}
 }
