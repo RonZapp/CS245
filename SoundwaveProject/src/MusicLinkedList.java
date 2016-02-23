@@ -140,46 +140,38 @@ public class MusicLinkedList implements MusicList{
 	 * @param newRate the new sampling rate
 	 */
 	public void changeSampleRate(float sampleRate) {
+		Double oldSampleRateDouble = (double) this.sampleRate;
+		Double newSampleRateDouble = (double) sampleRate;
 		MusicLinkedList newList = new MusicLinkedList(sampleRate, this.numChannels);
 		Iterator<float[]> itLeading = iterator();
 		Iterator<float[]> itFollowing = iterator();
 		float[] audioLeading = itLeading.next();
 		float[] audioFollowing = itFollowing.next();
-		float oldTimeLeading = 0;
-		float oldTimeFollowing = 0;
-		float newTime = 0;
+		double oldTimeLeading = 0;
+		double oldTimeFollowing = 0;
+		double newTime = 0;
 		
 		//first data point
 		audioLeading = itLeading.next();
-		oldTimeLeading += 1/this.sampleRate;
-		newList.addSample(oldTimeFollowing);
+		oldTimeLeading += 1/oldSampleRateDouble;
+		newList.addSample(audioFollowing);
 		newTime += 1/sampleRate;
-		
-		int count = 0;
 		
 		//rest of data points
 		while (newTime <= this.getDuration()) {
 			while (oldTimeLeading < newTime) {
 				audioLeading = itLeading.next();
-				oldTimeLeading += 1/this.sampleRate;
+				oldTimeLeading += 1/oldSampleRateDouble;
 			}
-			while (oldTimeFollowing < newTime - 1/this.sampleRate) {
+			while (oldTimeFollowing < newTime - 1/oldSampleRateDouble) {
 				audioFollowing = itFollowing.next();
-				oldTimeFollowing += 1/this.sampleRate;
+				oldTimeFollowing += 1/oldSampleRateDouble;
 			}
 			
-			float ratio = (newTime - oldTimeFollowing)/(oldTimeLeading - oldTimeFollowing);
-			count++;
-			if (count > 1198 && count < 1202) {
-				System.out.println("count: " + count + " newTime: " + newTime + " oldTimeLeading: " + oldTimeLeading + " oldTimeFollowing: "
-						+ oldTimeFollowing + " ratio: " + ratio);
-			}
+			double ratio = (newTime - oldTimeFollowing)/(oldTimeLeading - oldTimeFollowing);
 			float[] newSample = new float[numChannels];
 			for (int c = 0; c < numChannels; c++) {
-				newSample[c] = audioFollowing[c] + (audioLeading[c] - audioFollowing[c])*ratio;
-				if (count > 1198 && count < 1202) {
-					System.out.println("audioLeading: " + audioLeading[c] + " audioFollowing: " + audioFollowing[c]);
-				}
+				newSample[c] = (float) (audioFollowing[c] + (audioLeading[c] - audioFollowing[c])*ratio);
 			}
 			
 			newList.addSample(newSample);

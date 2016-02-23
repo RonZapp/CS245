@@ -398,11 +398,9 @@ public class TestMain {
 				
 					float nextCorrectSample = (float) Math.sin(currentTime *angleFrequency);
 					count++;
+
+						//System.out.println("Sample number: " + count + " Expected: " + nextCorrectSample + " Got: " + nextSample[i]);
 					
-					if (count == 1158) {
-						System.out.println("HERE WE GO");
-						System.out.println("Sample number: " + count + " Expected: " + nextCorrectSample + " Got: " + nextSample[i]);
-					}
 					if (!approxEqual(nextSample[i], nextCorrectSample))
 					{
 						if (success)
@@ -496,14 +494,14 @@ public class TestMain {
 		System.out.println("Testing resampling (1  channel)");
 		result = testResample(1, 20000, 5000, play);
 		printResult(result);
-//		System.out.println("Testing resampling (2  channels)");
-//		result = testResample(2, 20000, 13000, play);
-//		printResult(result);
-//		System.out.println("Testing resampling (10 channels)");
-//		result = testResample(10, 20000, 5000, false);
-//		printResult(result);
-//
-//
+		System.out.println("Testing resampling (2  channels)");
+		result = testResample(2, 20000, 13000, play);
+		printResult(result);
+		System.out.println("Testing resampling (10 channels)");
+		result = testResample(10, 20000, 5000, false);
+		printResult(result);
+
+
 //		MusicLinkedList m = SoundUtil.readWAVFile("test2.wav");
 //		MusicLinkedList echo = (MusicLinkedList) m.clone();
 //		MusicLinkedList resample = (MusicLinkedList) m.clone();
