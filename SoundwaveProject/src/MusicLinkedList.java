@@ -11,12 +11,14 @@ public class MusicLinkedList implements MusicList{
 	private float sampleRate;
 	private int numSamples;
 	private Sample head;
+	private Sample tail;
 	
 	public MusicLinkedList(float sampleRate, int numChannels) {
 		this.sampleRate = sampleRate;
 		this.numChannels = numChannels;
 		this.numSamples = 0;
 		this.head = null;
+		this.tail = null;
 	}
 
 	/**
@@ -103,7 +105,14 @@ public class MusicLinkedList implements MusicList{
 	 * @param sample The sample to add
 	 */
 	public void addSample(float audio) {
-		head = new Sample(audio, head, null);
+		if (tail == null) {
+			tail = new Sample(audio, null, null);
+			head = tail;
+		} else {
+			Sample newSample = new Sample(audio, null, null);
+			tail.next = newSample;
+			tail = newSample;
+		}
 		numSamples++;
 	}
 
@@ -114,18 +123,31 @@ public class MusicLinkedList implements MusicList{
 	 * @param sample Array of samples (one for each channel) to add to the end of the SoundList
 	 */
 	public void addSample(float[] audio) {
-		Sample currentSample = null;
-		for (int i = audio.length - 1; i >= 0; i--) {
-			Sample nextSample = head;
-			
-			if (nextSample != null) { //if this is not the first sample of this channel
-				for (int j = 0; j < i; j++) {
-					nextSample = nextSample.nextChannel;
-				}
-			}
-			currentSample = new Sample(audio[0], nextSample, currentSample);
+		if (audio.length != numChannels) {
+			throw new IllegalArgumentException("Audio being added does not have the correct number of channels");
 		}
-		head = currentSample;
+		if (tail == null) {
+			for (int i = audio.length - 1; i >= 0; i++) {
+				tail = new Sample(audio[i], null, tail);
+			}
+			head = tail;
+		} else {
+			Sample temp = tail;
+			Sample newSample = null;
+			
+			//create new Samples for each channel
+			for (int i = audio.length - 1; i >= 0; i++) {
+				newSample = new Sample(audio[i], null, newSample);
+			}
+			tail = newSample;
+			
+			//iterate over new samples and assign them to tail sample's next variable
+			while (temp != null) {
+				temp.next = newSample;
+				temp = temp.nextChannel;
+				newSample = newSample.nextChannel;
+			}
+		}
 		numSamples++;
 		
 		// TODO erase debugging stuff
