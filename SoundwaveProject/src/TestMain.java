@@ -146,6 +146,7 @@ public class TestMain {
 							if (singleSuceess)
 							{
 								System.out.println("Error:  Samples don't match:  Single iterator");
+								
 							}
 							singleSuceess = false;
 							success = false;
@@ -343,6 +344,7 @@ public class TestMain {
 			}
 			if (!approxEqual(time, mList.getDuration()))
 			{
+				System.out.println("expected time: " + time);
 				success = false;
 				System.out.println("Error:  Duration don't match");
 			}
@@ -385,6 +387,7 @@ public class TestMain {
 			ml.changeSampleRate(newSampleRate);
 			double currentTime = 0;
 			Iterator<float[]> it= ml.iterator();
+			int count = 0;
 	
 			while (it.hasNext())
 			{
@@ -394,6 +397,12 @@ public class TestMain {
 				{
 				
 					float nextCorrectSample = (float) Math.sin(currentTime *angleFrequency);
+					count++;
+					
+					if (count == 1158) {
+						System.out.println("HERE WE GO");
+						System.out.println("Sample number: " + count + " Expected: " + nextCorrectSample + " Got: " + nextSample[i]);
+					}
 					if (!approxEqual(nextSample[i], nextCorrectSample))
 					{
 						if (success)
@@ -454,39 +463,39 @@ public class TestMain {
 		boolean result = testSingleChanelSineWave(play);
 		printResult(result);
 
-//		System.out.println("Testing 2 channel simple sine wave");
-//		result = testMultiChannelSineWave(2, play);
-//		printResult(result);
-//
-//		System.out.println("Testing 10 channel simple sine wave");
-//		result = testMultiChannelSineWave(2, false);  // Can't play 10 channel sounds anyway!
-//		printResult(result);
-//
-//		System.out.println("Testing make mono (2 channel)");
-//		result = testMakeMono(2, play);
-//		printResult(result);
-//
-//		System.out.println("Testing make mono (10 channel)");
-//		result = testMakeMono(10, play);
-//		printResult(result);
-//
-//		System.out.println("Testing reverse (1 channel)");
-//		result = testReverse(1);
-//		printResult(result);
-//
-//		System.out.println("Testing reverse (10 channels)");
-//		result = testReverse(10);
-//		printResult(result);
-//		
-//		System.out.println("Testing rescale");
-//		result = testRescale(play);
-//		printResult(result);
-//
-//		
-//
-//		System.out.println("Testing resampling (1  channel)");
-//		result = testResample(1, 20000, 5000, play);
-//		printResult(result);
+		System.out.println("Testing 2 channel simple sine wave");
+		result = testMultiChannelSineWave(2, play);
+		printResult(result);
+
+		System.out.println("Testing 10 channel simple sine wave");
+		result = testMultiChannelSineWave(2, false);  // Can't play 10 channel sounds anyway!
+		printResult(result);
+
+		System.out.println("Testing make mono (2 channel)");
+		result = testMakeMono(2, play);
+		printResult(result);
+
+		System.out.println("Testing make mono (10 channel)");
+		result = testMakeMono(10, play);
+		printResult(result);
+
+		System.out.println("Testing reverse (1 channel)");
+		result = testReverse(1);
+		printResult(result);
+
+		System.out.println("Testing reverse (10 channels)");
+		result = testReverse(10);
+		printResult(result);
+		
+		System.out.println("Testing rescale");
+		result = testRescale(play);
+		printResult(result);
+
+		
+
+		System.out.println("Testing resampling (1  channel)");
+		result = testResample(1, 20000, 5000, play);
+		printResult(result);
 //		System.out.println("Testing resampling (2  channels)");
 //		result = testResample(2, 20000, 13000, play);
 //		printResult(result);
