@@ -70,7 +70,13 @@ public class MusicLinkedList implements MusicList{
 			toPointer = toPointer.next;
 		}
 		while (toPointer != null) {
-			toPointer.audio += fromPointer.audio*percent;
+			Sample toPointerChannelIterator = toPointer;
+			Sample fromPointerChannelIterator = fromPointer;
+			for (int i = 0; i < numChannels; i++) {
+				toPointerChannelIterator.audio += fromPointerChannelIterator.audio*percent;
+				toPointerChannelIterator = toPointerChannelIterator.nextChannel;
+				fromPointerChannelIterator = fromPointerChannelIterator.nextChannel;
+			}
 			toPointer = toPointer.next;
 			fromPointer = fromPointer.next;
 		}
@@ -277,8 +283,21 @@ public class MusicLinkedList implements MusicList{
 	 * @param duration Duration (in seconds)
 	 */
 	public void clip(float startTime, float duration) {
-		// TODO Auto-generated method stub
+		Sample pointer = head;
+		for (int i = 0; i < startTime*this.sampleRate; i++) {
+			pointer = pointer.next;
+		}
+		head = pointer;
+		for (int i = 0; i < duration*this.sampleRate; i++) {
+			pointer = pointer.next;
+		}
+		tail = pointer;
 		
+		Sample tailChannelIterator = tail;
+		for (int i = 0; i < numChannels; i++) {
+			tailChannelIterator.next = null;
+			tailChannelIterator = tailChannelIterator.nextChannel;
+		}
 	}
 
 	
@@ -289,8 +308,38 @@ public class MusicLinkedList implements MusicList{
 	 * @param clipToSplice The other SoundClip to splice in.  
 	 */
 	public void spliceIn(float startSpliceTime, MusicList clipToSplice) {
-		// TODO Auto-generated method stub
+		if (clipToSplice.getSampleRate() != this.sampleRate) {
+			clipToSplice.changeSampleRate(this.sampleRate);
+		}
 		
+		//find point where clip will be spliced in
+		Sample pointer = head;
+		for (int i = 0; i < startSpliceTime*this.sampleRate; i++) {
+			pointer = pointer.next;
+		}
+		
+		//create temporary holder for part of clip to go after splice
+		Sample tempHead = pointer.next;
+		Sample tempTail = this.tail;
+		this.tail = pointer; //set this clip to end at point where splice will start
+		
+		//add clipToSplice
+		Iterator<float[]> iterator = clipToSplice.iterator();
+		while (iterator.hasNext()) {
+			addSample(iterator.next());
+		}
+		
+		//connect tail of this clip (which is first part of original clip + cliptoSplice) with the head of the temp clip (which is second part of original clip)
+		Sample tailChannelIterator = tail;
+		Sample tempHeadChannelIterator = tempHead;
+		for (int i = 0; i < numChannels; i++) {
+			tailChannelIterator.next = tempHeadChannelIterator;
+			tailChannelIterator = tailChannelIterator.nextChannel;
+			tempHeadChannelIterator = tempHeadChannelIterator.nextChannel;
+		}
+		
+		//set tail to end of second part of original clip
+		this.tail = tempTail;
 	}
 
 	

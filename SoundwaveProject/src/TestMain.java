@@ -505,28 +505,28 @@ public class TestMain {
 		MusicLinkedList rev = (MusicLinkedList) m.clone();
 
 		echo.addEcho(0.3f, 0.4f);
-//		mono.makeMono(true);
-//		rev.reverse();
-//		resample.changeSampleRate(resample.getSampleRate() / 3.0f);
-//		System.out.println("Playing normal version");
-//		SoundUtil.play(m);
-//		System.out.println("Playing resampled version (should sound the same)");
-//		SoundUtil.play(resample);
-//		System.out.println("Playing mono version");
-//		SoundUtil.play(mono);
-//		System.out.println("Playing echo version");
-//		SoundUtil.play(echo);
-//		System.out.println("Playing reversed version");
-//		SoundUtil.play(rev);
-//		
-//		MusicLinkedList one_four = SoundUtil.readWAVFile("one_four.wav");
-//		MusicLinkedList two_three = SoundUtil.readWAVFile("two_three.wav");
-//		one_four.spliceIn(1, two_three);
-//		System.out.println("Playing one two three four");		
-//		SoundUtil.play(one_four);
-//		one_four.clip(1.0f,1.0f);
-//		System.out.println("Playing two");		
-//		SoundUtil.play(one_four);
+		mono.makeMono(true);
+		rev.reverse();
+		resample.changeSampleRate(resample.getSampleRate() / 3.0f);
+		System.out.println("Playing normal version");
+		SoundUtil.play(m);
+		System.out.println("Playing resampled version (should sound the same)");
+		SoundUtil.play(resample);
+		System.out.println("Playing mono version");
+		SoundUtil.play(mono);
+		System.out.println("Playing echo version");
+		SoundUtil.play(echo);
+		System.out.println("Playing reversed version");
+		SoundUtil.play(rev);
+		
+		MusicLinkedList one_four = SoundUtil.readWAVFile("one_four.wav");
+		MusicLinkedList two_three = SoundUtil.readWAVFile("two_three.wav");
+		one_four.spliceIn(1, two_three);
+		System.out.println("Playing one two three four");		
+		SoundUtil.play(one_four);
+		one_four.clip(1.0f,1.0f);
+		System.out.println("Playing two");		
+		SoundUtil.play(one_four);
 		
 	}
 
