@@ -64,8 +64,16 @@ public class MusicLinkedList implements MusicList{
 	 *        25 percent volume, and so on.  All samples should be clipped to the range -1 .. 1
 	 */
 	public void addEcho(float delay, float percent) {
-		// TODO Auto-generated method stub
-		
+		Sample fromPointer = head;
+		Sample toPointer = head;
+		for (int i = 0 ; i < delay*this.sampleRate; i++) {
+			toPointer = toPointer.next;
+		}
+		while (toPointer != null) {
+			toPointer.audio += fromPointer.audio*percent;
+			toPointer = toPointer.next;
+			fromPointer = fromPointer.next;
+		}
 	}
 
 	

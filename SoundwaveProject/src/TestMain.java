@@ -398,8 +398,6 @@ public class TestMain {
 				
 					float nextCorrectSample = (float) Math.sin(currentTime *angleFrequency);
 					count++;
-
-						//System.out.println("Sample number: " + count + " Expected: " + nextCorrectSample + " Got: " + nextSample[i]);
 					
 					if (!approxEqual(nextSample[i], nextCorrectSample))
 					{
@@ -409,8 +407,6 @@ public class TestMain {
 						}
 						success = false;
 					}
-
-					
 				}
 				currentTime +=  1.0 / (double) newSampleRate;
 			}
@@ -502,13 +498,13 @@ public class TestMain {
 		printResult(result);
 
 
-//		MusicLinkedList m = SoundUtil.readWAVFile("test2.wav");
-//		MusicLinkedList echo = (MusicLinkedList) m.clone();
-//		MusicLinkedList resample = (MusicLinkedList) m.clone();
-//		MusicLinkedList mono = (MusicLinkedList) m.clone();
-//		MusicLinkedList rev = (MusicLinkedList) m.clone();
-//
-//		echo.addEcho(0.3f, 0.4f);
+		MusicLinkedList m = SoundUtil.readWAVFile("test2.wav");
+		MusicLinkedList echo = (MusicLinkedList) m.clone();
+		MusicLinkedList resample = (MusicLinkedList) m.clone();
+		MusicLinkedList mono = (MusicLinkedList) m.clone();
+		MusicLinkedList rev = (MusicLinkedList) m.clone();
+
+		echo.addEcho(0.3f, 0.4f);
 //		mono.makeMono(true);
 //		rev.reverse();
 //		resample.changeSampleRate(resample.getSampleRate() / 3.0f);
